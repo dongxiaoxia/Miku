@@ -2,6 +2,7 @@ package xyz.dongxiaoxia.miku.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.dongxiaoxia.miku.Miku;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -21,9 +22,11 @@ public class MikuFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        logger.debug("----------------------------------------------------------------------");
-        logger.debug("执行请求：" + ((HttpServletRequest) servletRequest).getServletPath());
-        logger.debug("----------------------------------------------------------------------");
+        if (Miku.me.constants().isDevMode()){
+            logger.debug("----------------------------------------------------------------------");
+            logger.debug("执行请求：" + ((HttpServletRequest) servletRequest).getServletPath());
+            logger.debug("----------------------------------------------------------------------");
+        }
         filterChain.doFilter(servletRequest,servletResponse);
     }
 

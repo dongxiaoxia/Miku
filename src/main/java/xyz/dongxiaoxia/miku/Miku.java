@@ -4,7 +4,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xyz.dongxiaoxia.miku.config.MikuConfig;
+import xyz.dongxiaoxia.miku.config.Constants;
+import xyz.dongxiaoxia.miku.config.Modules;
 import xyz.dongxiaoxia.miku.dispatcher.MikuDispatcher;
 
 import java.io.IOException;
@@ -19,9 +20,9 @@ public class Miku {
     public static final Miku me = new Miku();
     private static final Logger logger = LoggerFactory.getLogger(Miku.class);
     private Injector injector;
-    private MikuConfig mikuConfig;
     private volatile MikuDispatcher mikuDispatcher;
-
+    private Constants constants;
+    private Modules modules;
     private static boolean isInit = false;
 
     private Miku() {
@@ -32,15 +33,16 @@ public class Miku {
      * <p>
      * 根据MikuConfig配置类初始化整个框架，包括处理配置文件，扫描Controller,创建Guice注入对象，初始化MikuDispatcher对象。
      *
-     * @param mikuConfig
+     * @param
      * @return
      */
-    public MikuDispatcher init(MikuConfig mikuConfig) {
+    public MikuDispatcher init(Constants constants, Modules modules) {
         if (isInit) return me.mikuDispatcher;//确保初始化一次
         logger.info("initializing Miku...");
-        this.mikuConfig = mikuConfig;
+        this.constants = constants;
+        this.modules = modules;
         logger.info("preparing an injector");
-        this.injector = Guice.createInjector(mikuConfig.module());
+        this.injector = Guice.createInjector(modules.getModules());
         logger.info("injector completed");
         logger.info("preparing an MikuDispatcher");
         this.mikuDispatcher = getInstance(MikuDispatcher.class);
@@ -69,12 +71,11 @@ public class Miku {
         return injector().getInstance(type);
     }
 
-    public MikuConfig mikuConfig() {
-        return mikuConfig;
-    }
-
     public MikuDispatcher dispatcher() {
         return mikuDispatcher;
     }
 
+    public Constants constants() {
+        return constants;
+    }
 }

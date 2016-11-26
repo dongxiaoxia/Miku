@@ -1,16 +1,17 @@
 package xyz.dongxiaoxia.miku.config;
 
-import com.google.inject.Module;
-import xyz.dongxiaoxia.miku.controller.MikuController;
-
-import java.util.Set;
-
 /**
  * Created by 东小侠 on 2016/11/18.
+ *
+ * 提供给客户端的配置类，默认什么多钟不处理，客户端通过继承该类修改配置内容。
  */
-public interface MikuConfig {
+public class MikuConfig {
 
-    Set<Class<? extends MikuController>> controllerClasses();
+    public void configConstants(Constants me){
 
-    Module module();
+    }
+
+    public void configModules(Modules me){
+
+    }
 }

@@ -28,7 +28,7 @@ public class MikuDispatcherServlet extends HttpServlet {
         super.init();
         logger.info(this.getClass().getName() + ".init()");
         try {
-            dispatcher = MikuDispatcherFactory.create();
+            dispatcher = MikuDispatcherFactory.create(getServletContext());
             dispatcher.init();
         } catch (Exception e) {
             logger.error("failed to Miku initialize,system exit!!!", e);

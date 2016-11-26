@@ -1,17 +1,46 @@
 package xyz.dongxiaoxia.miku.dispatcher;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import xyz.dongxiaoxia.miku.config.Constants;
 import xyz.dongxiaoxia.miku.Miku;
-import xyz.dongxiaoxia.miku.config.DefaultMikuConfig;
 import xyz.dongxiaoxia.miku.config.MikuConfig;
+import xyz.dongxiaoxia.miku.MikuException;
+import xyz.dongxiaoxia.miku.config.Modules;
+
+import javax.servlet.ServletContext;
 
 /**
  * Created by 东小侠 on 2016/11/18.
  */
 public class MikuDispatcherFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MikuDispatcherFactory.class);
+    public static MikuDispatcher create(ServletContext servletContext) {
+        String className = servletContext.getInitParameter("configClass");
+        MikuConfig mikuConfig;
+        if (className == null || className.trim().equals("")){
+            mikuConfig = new MikuConfig();
+        }else{
+            try {
+                Class clazz = Class.forName(className);
+                if (!MikuConfig.class.isAssignableFrom(clazz)){
+                    mikuConfig = new MikuConfig();
+                }
+                else {
+                    mikuConfig = (MikuConfig) clazz.newInstance();
+                }
+            } catch (Exception e){
+                LOGGER.error(e.getMessage(), e);
+                throw new MikuException(e.getMessage(),e);
+            }
+        }
 
-    public static MikuDispatcher create() {
-        MikuConfig mikuConfig = new DefaultMikuConfig();
-        return Miku.me.init(mikuConfig);
+        Constants constants = new Constants();
+        Modules modules = new Modules();
+        mikuConfig.configConstants(constants);
+        mikuConfig.configModules(modules);
+        return Miku.me.init(constants,modules);
+
     }
 
 }
