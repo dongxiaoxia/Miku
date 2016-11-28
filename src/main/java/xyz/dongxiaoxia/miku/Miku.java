@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import xyz.dongxiaoxia.miku.config.Constants;
 import xyz.dongxiaoxia.miku.config.Modules;
 import xyz.dongxiaoxia.miku.dispatcher.MikuDispatcher;
+import xyz.dongxiaoxia.miku.interceptor.Interceptors;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +24,7 @@ public class Miku {
     private volatile MikuDispatcher mikuDispatcher;
     private Constants constants;
     private Modules modules;
+    private Interceptors interceptors;
     private static boolean isInit = false;
 
     private Miku() {
@@ -36,11 +38,12 @@ public class Miku {
      * @param
      * @return
      */
-    public MikuDispatcher init(Constants constants, Modules modules) {
+    public MikuDispatcher init(Constants constants, Modules modules,Interceptors interceptors) {
         if (isInit) return me.mikuDispatcher;//确保初始化一次
         logger.info("initializing Miku...");
         this.constants = constants;
         this.modules = modules;
+        this.interceptors = interceptors;
         logger.info("preparing an injector");
         this.injector = Guice.createInjector(modules.getModules());
         logger.info("injector completed");
@@ -77,5 +80,9 @@ public class Miku {
 
     public Constants constants() {
         return constants;
+    }
+
+    public Interceptors interceptors() {
+        return interceptors;
     }
 }

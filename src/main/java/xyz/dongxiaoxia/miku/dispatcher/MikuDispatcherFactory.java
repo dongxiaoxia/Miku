@@ -7,6 +7,7 @@ import xyz.dongxiaoxia.miku.Miku;
 import xyz.dongxiaoxia.miku.config.MikuConfig;
 import xyz.dongxiaoxia.miku.MikuException;
 import xyz.dongxiaoxia.miku.config.Modules;
+import xyz.dongxiaoxia.miku.interceptor.Interceptors;
 
 import javax.servlet.ServletContext;
 
@@ -37,10 +38,10 @@ public class MikuDispatcherFactory {
 
         Constants constants = new Constants();
         Modules modules = new Modules();
+        Interceptors interceptors = new Interceptors();
         mikuConfig.configConstants(constants);
         mikuConfig.configModules(modules);
-        return Miku.me.init(constants,modules);
-
+        mikuConfig.configInterceptors(interceptors);
+        return Miku.me.init(constants,modules,interceptors);
     }
-
 }

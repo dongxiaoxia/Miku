@@ -11,6 +11,8 @@ import xyz.dongxiaoxia.miku.controller.Action;
 import xyz.dongxiaoxia.miku.controller.ControllerInfo;
 import xyz.dongxiaoxia.miku.controller.MikuController;
 import xyz.dongxiaoxia.miku.controller.RouterInfo;
+import xyz.dongxiaoxia.miku.interceptor.Interceptor;
+import xyz.dongxiaoxia.miku.interceptor.InterceptorInfo;
 import xyz.dongxiaoxia.miku.model.DefaultModel;
 import xyz.dongxiaoxia.miku.utils.ClassUtils;
 import xyz.dongxiaoxia.miku.view.Render;
@@ -20,11 +22,10 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
+
+import static xyz.dongxiaoxia.miku.Miku.me;
 
 /**
  * Created by 东小侠 on 2016/11/18.
@@ -38,7 +39,7 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
     @Inject
     public DefaultMikuDispatcher() {
         List<Action> actions = new ArrayList<>();
-        Set<Class<?>> classSet = ClassUtils.getClasses(Miku.me.constants().getControllerPath());
+        Set<Class<?>> classSet = ClassUtils.getClasses(me.constants().getControllerPath());
         Pattern controllerPattern = Pattern.compile(".*Controller");
         Set<Class<? extends MikuController>> controllerClasses = new HashSet<>();
         for (Class<?> clazz : classSet) {
@@ -53,7 +54,7 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
         }
         if (!controllerClasses.isEmpty()) {
             for (Class<? extends MikuController> controllerClass : controllerClasses) {
-                MikuController controller = Miku.me.getInstance(controllerClass);
+                MikuController controller = me.getInstance(controllerClass);
                 controller.init();
                 ControllerInfo controllerInfo = new ControllerInfo(controller);
                 actions.addAll(controllerInfo.analyze());
@@ -77,6 +78,15 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
         try {
             Render render = null;
             RouterInfo routerInfo = RouterInfo.create(context);
+            List<Interceptor> interceptors = patternInterceptors(routerInfo);
+            int size = interceptors.size();
+            if (size > 0) {
+                for (Interceptor interceptor : interceptors) {
+                    if (!interceptor.preHandle(context.getRequest(), context.getResponse(), null)){
+                        return;
+                    }
+                }
+            }
             for (Action action : actions) {
                 render = action.matchAndInvoke(routerInfo);
                 if (render != null) {
@@ -85,8 +95,11 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
             }
             if (render == null) {
                 context.getResponse().setStatus(404);
-            } else {
-//                render.render(requestContext);
+            }
+            if (size > 0) {
+                for (int i = size - 1; i >= 0; i--) {
+                    interceptors.get(i).postHandle(context.getRequest(), context.getResponse(), null);
+                }
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -119,6 +132,44 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
                     + " as a servlet filter for this currentRequest.");
         }
         return context;
+    }
+
+    /**
+     * 根据路径匹配拦截器
+     *
+     * @param routerInfo
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    private List<Interceptor> patternInterceptors(RouterInfo routerInfo) throws IllegalAccessException, InstantiationException {
+        List<InterceptorInfo> interceptorInfos = Miku.me.interceptors().getInterceptors();
+        List<Interceptor> interceptors = new ArrayList<>();
+        for (InterceptorInfo interceptorInfo : interceptorInfos) {
+            List<String> mapping = interceptorInfo.getMapping();
+            List<String> excludeMapping = interceptorInfo.getExcludeMapping();
+            boolean flag = true;
+            if (excludeMapping!=null && excludeMapping.size()>0){
+                for (String ss : excludeMapping) {
+                    if (Pattern.matches(ss, routerInfo.getPath())) {
+                        flag = false;
+                        break;
+                    }
+                }
+            }
+            if (flag) {
+                if (mapping!=null && !mapping.isEmpty()){
+                    for (String s : mapping) {
+                        if (Pattern.matches(s, routerInfo.getPath())) {
+                            interceptors.add(interceptorInfo.getInterceptor().newInstance());
+                            break;
+                        }
+
+                    }
+                }
+            }
+        }
+        return interceptors;
     }
 
 }
