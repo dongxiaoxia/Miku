@@ -16,13 +16,17 @@ import xyz.dongxiaoxia.miku.interceptor.InterceptorInfo;
 import xyz.dongxiaoxia.miku.model.DefaultModel;
 import xyz.dongxiaoxia.miku.utils.ClassUtils;
 import xyz.dongxiaoxia.miku.view.Render;
+import xyz.dongxiaoxia.miku.view.StatusCodeRender;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static xyz.dongxiaoxia.miku.Miku.me;
@@ -94,7 +98,7 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
                 }
             }
             if (render == null) {
-                context.getResponse().setStatus(404);
+                StatusCodeRender.render404(context);
             }
             if (size > 0) {
                 for (int i = size - 1; i >= 0; i--) {
@@ -103,7 +107,9 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            context.getResponse().setStatus(405);
+            StatusCodeRender.render405(context);
+        }finally {
+            localContext.remove();
         }
     }
 
