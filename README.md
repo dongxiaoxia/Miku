@@ -1,5 +1,5 @@
 # Miku 
 
-[![Build Status](https://img.shields.io/travis/biezhi/blade.svg?style=flat-square)](https://travis-ci.org/biezhi/blade)
+[![Build Status](https://travis-ci.org/dongxiaoxia/Miku.svg?branch=master&style=flat-square)](https://travis-ci.org/dongxiaoxia/Miku)
 
 ### 一个Java Web MVC 框架。
