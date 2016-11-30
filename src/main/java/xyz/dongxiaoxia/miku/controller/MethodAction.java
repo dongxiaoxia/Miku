@@ -16,16 +16,44 @@ import java.util.regex.Pattern;
 
 /**
  * Created by 东小侠 on 2016/11/19.
+ * <p>
+ * Controller下面的方法对应的处理request客户端请求的封装对象
  */
 public class MethodAction implements Action {
 
+    /**
+     * Action对应的 {@link ControllerInfo}对象
+     */
     private final ControllerInfo controllerInfo;
+
+    /**
+     * 对象的方法
+     */
     private final Method method;
+
+    /**
+     * 对应的request请求方法
+     */
     private final RequestMethod requestMethod;
+
+    /**
+     * 路径正则表达式
+     */
     private final String pathPattern;
 
+    /**
+     * 对应的方法参数名称列表，按顺序排序
+     */
     private final List<String> paramName;
+
+    /**
+     * 对应的方法参数类型列表，按顺序排序
+     */
     private final List<Class<?>> paramTypes;
+
+    /**
+     * 对应方法上的所有注解
+     */
     private final Set<Annotation> annotations;
 
     private final boolean isPattern;
@@ -47,13 +75,19 @@ public class MethodAction implements Action {
         this.isPattern = false;
     }
 
+    /**
+     * 匹配路由信息并且处理请求
+     *
+     * @param routerInfo 当前请求的路由信息
+     * @return 匹配或指向处理请求结果
+     */
     @Override
     public Render matchAndInvoke(RouterInfo routerInfo) {
-        if (RequestMethod.GET.equals(this.requestMethod) && !routerInfo.getRequestMethod().equals(RequestMethod.GET)){
-                return null;
+        if (RequestMethod.GET.equals(this.requestMethod) && !routerInfo.getRequestMethod().equals(RequestMethod.GET)) {
+            return Render.NULL;
         }
-        if (RequestMethod.POST.equals(this.requestMethod) && !routerInfo.getRequestMethod().equals(RequestMethod.POST)){
-            return null;
+        if (RequestMethod.POST.equals(this.requestMethod) && !routerInfo.getRequestMethod().equals(RequestMethod.POST)) {
+            return Render.NULL;
         }
         String path = "".equals(routerInfo.getPath()) ? routerInfo.getSimplePath() : routerInfo.getPath();
         if (!Pattern.compile(pathPattern).matcher(path).matches()) return null;

@@ -33,11 +33,21 @@ import static xyz.dongxiaoxia.miku.Miku.me;
 
 /**
  * Created by 东小侠 on 2016/11/18.
+ * <p>
+ * 框架默认的用于处理request客户端请求的调度类
  */
 @Singleton
 public class DefaultMikuDispatcher implements MikuDispatcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMikuDispatcher.class);
+
+    /**
+     * 当前线程的请求上下文，用ThreadLocal确保为当前对象
+     */
     private final ThreadLocal<RequestContext> localContext = new ThreadLocal<>();
+
+    /**
+     * 系统所有的Action列表
+     */
     private final List<Action> actions;
 
     @Inject
@@ -70,11 +80,20 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
         this.actions = actions;
     }
 
+    /**
+     * 调度器初始化
+     */
     @Override
     public void init() {
 
     }
 
+    /**
+     * 调度分发客户端请求
+     *
+     * @param request  当前请求的 {@link HttpServletRequest}对象
+     * @param response 当前请求的 {@link HttpServletResponse}对象
+     */
     @Override
     public void service(HttpServletRequest request, HttpServletResponse response) {
         RequestContext context = new DefaultRequestContext(request, response, new DefaultModel());
@@ -86,18 +105,18 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
             int size = interceptors.size();
             if (size > 0) {
                 for (Interceptor interceptor : interceptors) {
-                    if (!interceptor.preHandle(context.getRequest(), context.getResponse(), null)){
+                    if (!interceptor.preHandle(context.getRequest(), context.getResponse(), null)) {
                         return;
                     }
                 }
             }
             for (Action action : actions) {
                 render = action.matchAndInvoke(routerInfo);
-                if (render != null) {
+                if (render != Render.NULL) {
                     break;
                 }
             }
-            if (render == null) {
+            if (render == Render.NULL) {
                 StatusCodeRender.render404(context);
             }
             if (size > 0) {
@@ -108,26 +127,38 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             StatusCodeRender.render405(context);
-        }finally {
+        } finally {
             localContext.remove();
         }
     }
 
+    /**
+     * 调度器销毁
+     */
     @Override
     public void destroy() {
 
     }
 
+    /**
+     * @return 当前请求的 {@link HttpServletRequest}对象
+     */
     @Override
     public HttpServletRequest currentRequest() {
         return currentRequestContext().getRequest();
     }
 
+    /**
+     * @return 当前请求的 {@link HttpServletResponse}对象
+     */
     @Override
     public HttpServletResponse currentResponse() {
         return currentRequestContext().getResponse();
     }
 
+    /**
+     * @return 当前请求的 {@link RequestContext}对象
+     */
     @Override
     public RequestContext currentRequestContext() {
         RequestContext context = localContext.get();
@@ -155,7 +186,7 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
             List<String> mapping = interceptorInfo.getMapping();
             List<String> excludeMapping = interceptorInfo.getExcludeMapping();
             boolean flag = true;
-            if (excludeMapping!=null && excludeMapping.size()>0){
+            if (excludeMapping != null && excludeMapping.size() > 0) {
                 for (String ss : excludeMapping) {
                     if (Pattern.matches(ss, routerInfo.getPath())) {
                         flag = false;
@@ -164,7 +195,7 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
                 }
             }
             if (flag) {
-                if (mapping!=null && !mapping.isEmpty()){
+                if (mapping != null && !mapping.isEmpty()) {
                     for (String s : mapping) {
                         if (Pattern.matches(s, routerInfo.getPath())) {
                             interceptors.add(interceptorInfo.getInterceptor().newInstance());
@@ -177,5 +208,4 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
         }
         return interceptors;
     }
-
 }

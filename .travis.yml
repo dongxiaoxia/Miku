@@ -6,4 +6,4 @@ jdk:
 install:
   - mvn test-compile -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 after_success:
-  - mvn coveralls:report
+- mvn clean cobertura:cobertura coveralls:report

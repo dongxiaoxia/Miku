@@ -8,6 +8,8 @@ import java.util.Set;
 
 /**
  * Created by 东小侠 on 2016/11/21.
+ * <p>
+ * 默认的静态资源对应的处理request客户端请求的封装对象
  */
 public class StaticAction implements Action {
 
@@ -20,7 +22,7 @@ public class StaticAction implements Action {
         return render;
     }
 
-    public StaticAction(){
+    public StaticAction() {
         staticFiles.add("/index.html");
     }
 }

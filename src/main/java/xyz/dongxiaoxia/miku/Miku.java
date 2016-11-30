@@ -38,7 +38,7 @@ public class Miku {
      * @param
      * @return
      */
-    public MikuDispatcher init(Constants constants, Modules modules,Interceptors interceptors) {
+    public MikuDispatcher init(Constants constants, Modules modules, Interceptors interceptors) {
         if (isInit) return me.mikuDispatcher;//确保初始化一次
         logger.info("initializing Miku...");
         this.constants = constants;
@@ -55,33 +55,55 @@ public class Miku {
         return mikuDispatcher;
     }
 
+    /**
+     * 框架成功后打印Banner字符
+     */
     private void printBanner() {
         InputStream in = Miku.class.getClassLoader().getResourceAsStream("banner.txt");
         try {
             byte[] bytes = new byte[in.available()];
             in.read(bytes);
             in.close();
-            logger.info("\n"+new String(bytes,"utf-8"));
+            logger.info("\n" + new String(bytes, "utf-8"));
         } catch (IOException e) {
         }
     }
 
+    /**
+     * @return 框架IOC注入器
+     */
     public Injector injector() {
         return injector;
     }
 
+    /**
+     * 根据Class构建对应的实例
+     *
+     * @param type Class类型
+     * @param <T>
+     * @return
+     */
     public <T> T getInstance(Class<T> type) {
         return injector().getInstance(type);
     }
 
+    /**
+     * @return 框架的Servlet调度器，负责url调度分发
+     */
     public MikuDispatcher dispatcher() {
         return mikuDispatcher;
     }
 
+    /**
+     * @return 框架配置常量
+     */
     public Constants constants() {
         return constants;
     }
 
+    /**
+     * @return 框架配置的拦截器
+     */
     public Interceptors interceptors() {
         return interceptors;
     }

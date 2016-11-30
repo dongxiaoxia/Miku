@@ -7,6 +7,8 @@ import java.util.List;
 
 /**
  * Created by 东小侠 on 2016/11/27.
+ * <p>
+ * 框架的Guice IOC {@link Module} 配置类
  */
 public class Modules {
 
@@ -24,7 +26,7 @@ public class Modules {
         this.modules = modules;
     }
 
-    public void add(Module module){
+    public void add(Module module) {
         this.modules.add(module);
     }
 }

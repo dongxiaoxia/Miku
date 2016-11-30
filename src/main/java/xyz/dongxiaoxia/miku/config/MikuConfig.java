@@ -10,9 +10,7 @@ import xyz.dongxiaoxia.miku.interceptor.Interceptors;
 public class MikuConfig {
 
     /**
-     * 配置系统常量
-     *
-     * @param me
+     * @param me 配置系统常量
      */
     public void configConstants(Constants me) {
 

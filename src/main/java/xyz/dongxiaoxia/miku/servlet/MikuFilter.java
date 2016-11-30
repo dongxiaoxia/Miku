@@ -11,10 +11,13 @@ import java.io.IOException;
 
 /**
  * Created by 东小侠 on 2016/11/23.
+ * <p>
+ * 框架debug过滤器，开启debugger模式时，拦截所有请求，并输出对应的请求路径
  */
-@WebFilter(filterName = "MikuFilter" ,urlPatterns = "/*" )
+@WebFilter(filterName = "MikuFilter", urlPatterns = "/*")
 public class MikuFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(MikuFilter.class);
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         logger.info("MikuFilter init");
@@ -22,12 +25,12 @@ public class MikuFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        if (Miku.me.constants().isDevMode()){
+        if (Miku.me.constants().isDevMode()) {
             logger.debug("----------------------------------------------------------------------");
             logger.debug("执行请求：" + ((HttpServletRequest) servletRequest).getServletPath());
             logger.debug("----------------------------------------------------------------------");
         }
-        filterChain.doFilter(servletRequest,servletResponse);
+        filterChain.doFilter(servletRequest, servletResponse);
     }
 
     @Override

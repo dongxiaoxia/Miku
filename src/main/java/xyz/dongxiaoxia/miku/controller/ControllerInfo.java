@@ -10,13 +10,39 @@ import java.util.stream.Collectors;
 
 /**
  * Created by 东小侠 on 2016/11/19.
+ * <p>
+ * Controller控制器信息封装类
  */
 public class ControllerInfo {
+
+    /**
+     * 对象的Controller对象
+     */
     private final MikuController controller;
+
+    /**
+     * Controller Class类型
+     */
     private final Class<? extends MikuController> clazz;
+
+    /**
+     * Controller 类上的RequestMapping注解
+     */
     private RequestMapping requestMapping;
+
+    /**
+     * Controller类上对应的请求方法
+     */
     private RequestMethod requestMethod;
+
+    /**
+     * Controller类上的url请求路径
+     */
     private final String pathUrl;
+
+    /**
+     * Controller类上的所有注解
+     */
     private final Set<Annotation> annotations;
 
     public ControllerInfo(MikuController mikuController) {
@@ -37,6 +63,9 @@ public class ControllerInfo {
         this.pathUrl = pathUrl;
     }
 
+    /**
+     * @return 分析并返回Controller下所有的Action
+     */
     public List<Action> analyze() {
         List<Action> actions = new ArrayList<>();
         Set<Method> methods = new HashSet<>(Arrays.asList(clazz.getDeclaredMethods()));

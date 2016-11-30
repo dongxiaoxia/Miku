@@ -2,6 +2,8 @@ package xyz.dongxiaoxia.miku;
 
 /**
  * Created by 东小侠 on 2016/11/25.
+ * <p>
+ * 框架自定义错误类
  */
 public class MikuException extends RuntimeException {
 
