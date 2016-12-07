@@ -44,6 +44,6 @@ public class MikuDispatcherFactory {
         mikuConfig.configConstants(constants);
         mikuConfig.configModules(modules);
         mikuConfig.configInterceptors(interceptors);
-        return Miku.me.init(constants, modules, interceptors);
+        return Miku.me.init(servletContext,constants, modules, interceptors);
     }
 }

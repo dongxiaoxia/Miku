@@ -9,6 +9,7 @@ import xyz.dongxiaoxia.miku.config.Modules;
 import xyz.dongxiaoxia.miku.dispatcher.MikuDispatcher;
 import xyz.dongxiaoxia.miku.interceptor.Interceptors;
 
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -25,6 +26,7 @@ public class Miku {
     private Constants constants;
     private Modules modules;
     private Interceptors interceptors;
+    private ServletContext servletContext;
     private static boolean isInit = false;
 
     private Miku() {
@@ -38,11 +40,13 @@ public class Miku {
      * @param
      * @return
      */
-    public MikuDispatcher init(Constants constants, Modules modules, Interceptors interceptors) {
+    public MikuDispatcher init(ServletContext servletContext, Constants constants, Modules modules, Interceptors interceptors) {
         if (isInit) return me.mikuDispatcher;//确保初始化一次
         logger.info("initializing Miku...");
+        this.servletContext = servletContext;
         this.constants = constants;
         this.modules = modules;
+        modules.add(new MikuModule());
         this.interceptors = interceptors;
         logger.info("preparing an injector");
         this.injector = Guice.createInjector(modules.getModules());
@@ -106,5 +110,12 @@ public class Miku {
      */
     public Interceptors interceptors() {
         return interceptors;
+    }
+
+    /**
+     * @return 框架初始化的ServletContext
+     */
+    public ServletContext servletContext() {
+        return this.servletContext;
     }
 }

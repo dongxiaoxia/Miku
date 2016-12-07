@@ -60,14 +60,6 @@ public class MikuRequest extends HttpServletRequestWrapper implements Closeable 
     public MikuRequest(HttpServletRequest request, MultipartConfigElement config) {
         super(request);
         this.request = request;
-        if (config == null) {
-            File tempDir = (File) request.getServletContext().getAttribute("javax.servlet.context.tempdir");
-            try {
-                config = new MultipartConfigElement(tempDir.getCanonicalPath());
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
         this.config = config;
         //处理请求数据
         parseParam();

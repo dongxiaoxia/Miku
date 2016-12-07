@@ -3,11 +3,11 @@ package xyz.dongxiaoxia.miku.controller;
 import xyz.dongxiaoxia.miku.MikuException;
 import xyz.dongxiaoxia.miku.annotation.RequestMapping;
 import xyz.dongxiaoxia.miku.annotation.RequestMethod;
+import xyz.dongxiaoxia.miku.context.MikuRequest;
 import xyz.dongxiaoxia.miku.context.RequestContext;
 import xyz.dongxiaoxia.miku.model.Model;
 import xyz.dongxiaoxia.miku.view.Render;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -96,7 +96,7 @@ public class MethodAction implements Action {
         RequestContext context = routerInfo.getRequestContext();
         if (size > 0) {
             for (int i = 0; i < size; i++) {
-                if (HttpServletRequest.class.equals(paramTypes.get(i))) {
+                if (paramTypes.get(i).isAssignableFrom(MikuRequest.class)) {
                     param[i] = context.getRequest();
                 } else if (HttpServletResponse.class.equals(paramTypes.get(i))) {
                     param[i] = context.getResponse();

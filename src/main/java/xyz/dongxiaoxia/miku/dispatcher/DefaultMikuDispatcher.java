@@ -6,6 +6,7 @@ import xyz.dongxiaoxia.miku.Miku;
 import xyz.dongxiaoxia.miku.MikuException;
 import xyz.dongxiaoxia.miku.annotation.Controller;
 import xyz.dongxiaoxia.miku.context.DefaultRequestContext;
+import xyz.dongxiaoxia.miku.context.MikuRequest;
 import xyz.dongxiaoxia.miku.context.RequestContext;
 import xyz.dongxiaoxia.miku.controller.Action;
 import xyz.dongxiaoxia.miku.controller.ControllerInfo;
@@ -20,6 +21,7 @@ import xyz.dongxiaoxia.miku.view.StatusCodeRender;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Modifier;
@@ -41,6 +43,11 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMikuDispatcher.class);
 
     /**
+     * 上传文件配置（Guice控制单例）
+     */
+    MultipartConfigElement config;
+
+    /**
      * 当前线程的请求上下文，用ThreadLocal确保为当前对象
      */
     private final ThreadLocal<RequestContext> localContext = new ThreadLocal<>();
@@ -51,7 +58,7 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
     private final List<Action> actions;
 
     @Inject
-    public DefaultMikuDispatcher() {
+    public DefaultMikuDispatcher(MultipartConfigElement config) {
         List<Action> actions = new ArrayList<>();
         Set<Class<?>> classSet = ClassUtils.getClasses(me.constants().getControllerPath());
         Pattern controllerPattern = Pattern.compile(".*Controller");
@@ -78,6 +85,7 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
 //        StaticAction staticAction = new StaticAction();
 //        actions.add(staticAction);
         this.actions = actions;
+        this.config = config;
     }
 
     /**
@@ -96,7 +104,8 @@ public class DefaultMikuDispatcher implements MikuDispatcher {
      */
     @Override
     public void service(HttpServletRequest request, HttpServletResponse response) {
-        RequestContext context = new DefaultRequestContext(request, response, new DefaultModel());
+        MikuRequest mikuRequest = new MikuRequest(request, config);
+        RequestContext context = new DefaultRequestContext(mikuRequest, response, new DefaultModel());
         localContext.set(context);
         try {
             Render render = null;
