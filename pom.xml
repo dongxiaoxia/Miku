@@ -19,6 +19,14 @@
 
     </properties>
 
+    <repositories>
+        <repository>
+            <id>dongxiaoxia-repository</id>
+            <name>东小侠的仓库</name>
+            <url>https://raw.githubusercontent.com/dongxiaoxia/maven-repo/master</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
