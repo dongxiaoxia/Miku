@@ -45,11 +45,11 @@ public class Miku {
         logger.info("initializing Miku...");
         this.servletContext = servletContext;
         this.constants = constants;
-        this.modules = modules;
         modules.add(new MikuModule());
+        this.modules = modules;
         this.interceptors = interceptors;
         logger.info("preparing an injector");
-        this.injector = Guice.createInjector(modules.getModules());
+        this.injector = Guice.createInjector(this.modules.getModules());
         logger.info("injector completed");
         logger.info("preparing an MikuDispatcher");
         this.mikuDispatcher = getInstance(MikuDispatcher.class);
